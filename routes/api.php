@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\Api\V1\Auth;
+use App\Http\Controllers\Api\V1\VehicleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,8 +21,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    // profile routes
     Route::get('profile', [Auth\ProfileController::class, 'show']);
     Route::put('profile', [Auth\ProfileController::class, 'update']);
+
+    // vehicle routes
+    Route::apiResource('vehicles', VehicleController::class);
 });
 
 Route::post('auth/register', Auth\RegisterController::class);
