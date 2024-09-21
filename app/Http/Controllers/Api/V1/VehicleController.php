@@ -7,24 +7,14 @@ use App\Models\Vehicle;
 use Illuminate\Http\Response;
 use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Resources\VehicleResource;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 class VehicleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         return VehicleResource::collection(Vehicle::all());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(StoreVehicleRequest $request)
     {
         $vehicle = Vehicle::create($request->validated());
@@ -32,37 +22,28 @@ class VehicleController extends Controller
         return VehicleResource::make($vehicle);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Vehicle  $vehicle
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Vehicle $vehicle)
+    public function show($id)
     {
-        return VehicleResource::make($vehicle);
+        try {
+            $vehicle = Vehicle::findOrFail($id);
+            return VehicleResource::make($vehicle);
+        } catch(ModelNotFoundException $e) {
+            return response()->json(['error' => 'Vehicle not found'], Response::HTTP_NOT_FOUND);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Vehicle  $vehicle
-     * @return \Illuminate\Http\Response
-     */
-    public function update(StoreVehicleRequest $request, Vehicle $vehicle)
+    public function update(StoreVehicleRequest $request, $id)
     {
-        $vehicle->update($request->validated());
+        try {
+            $vehicle = Vehicle::findOrFail($id);
+            $vehicle->update($request->validated());
 
-        return response()->json(VehicleResource::make($vehicle), Response::HTTP_ACCEPTED);
+            return response()->json(VehicleResource::make($vehicle), Response::HTTP_ACCEPTED);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Vehicle Not Found'], Response::HTTP_NOT_FOUND);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Vehicle  $vehicle
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Vehicle $vehicle)
     {
         $vehicle->delete();
