@@ -23,4 +23,10 @@ class Vehicle extends Model
         'user_id',
         'plate_number',
     ];
+
+    // Relasi One To Many
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
